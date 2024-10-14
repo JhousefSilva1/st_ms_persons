@@ -1,18 +1,26 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service;
 
+
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.StCountryDTO;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.StResponseDTO;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+@AllArgsConstructor
 @Service
 public class StPersonService {
 
     @Autowired
     private StPersonRepository stPersonRepository;
+
+    private final RestTemplate restTemplate;
 
     public List<StPersonEntity> getAllPersons() {
         return stPersonRepository.findAll();
@@ -36,8 +44,20 @@ public class StPersonService {
         stPersonRepository.deleteById(id);
     }
 
-//    public List<StPersonEntity> findByCountryId(Long countryId) {
-//        return stPersonRepository.findByCountryId(countryId);
-//    }
+    public StResponseDTO getPersonWithCountry(Long id) {
+
+        StResponseDTO responseDTO = new StResponseDTO();
+        StPersonEntity person = new StPersonEntity();
+        person = stPersonRepository.findById(id).get();
+
+        ResponseEntity<StCountryDTO> responseEntity = restTemplate.getForEntity("http://localhost:8002/api/country/" + person.getIdCountry(), StCountryDTO.class);
+
+        StCountryDTO countryDto = responseEntity.getBody();
+
+        responseDTO.setPerson(person);
+        responseDTO.setCountryDto(countryDto);
+
+        return responseDTO;
+    }
 
 }
