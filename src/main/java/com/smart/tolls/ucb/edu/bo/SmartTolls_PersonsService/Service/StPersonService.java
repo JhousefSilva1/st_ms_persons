@@ -1,6 +1,7 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service;
 
 
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.StCityDTO;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.StCountryDTO;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.StResponseDTO;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntity;
@@ -51,11 +52,13 @@ public class StPersonService {
         person = stPersonRepository.findById(id).get();
 
         ResponseEntity<StCountryDTO> responseEntity = restTemplate.getForEntity("http://localhost:8002/api/country/" + person.getIdCountry(), StCountryDTO.class);
-
+        ResponseEntity<StCityDTO> responseEntity1 = restTemplate.getForEntity("http://localhost:8002/api/city/" + person.getIdCity(), StCityDTO.class);
         StCountryDTO countryDto = responseEntity.getBody();
+        StCityDTO cityDto = responseEntity1.getBody();
 
         responseDTO.setPerson(person);
         responseDTO.setCountryDto(countryDto);
+        responseDTO.setCityDto(cityDto);
 
         return responseDTO;
     }

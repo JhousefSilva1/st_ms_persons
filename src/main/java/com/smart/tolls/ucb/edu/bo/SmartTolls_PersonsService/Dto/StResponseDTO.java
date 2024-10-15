@@ -14,4 +14,6 @@ public class StResponseDTO {
 
     private StCountryDTO countryDto;
 
+    private StCityDTO cityDto;
+
 }

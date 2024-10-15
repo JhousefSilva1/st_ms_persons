@@ -36,10 +36,20 @@ public class StPersonEntity {
     //@Column(name = "st_person_email")
     private String personEmail;
 
+    private String personPassword;
+
+    private String personDni;
+
+    private String personAddress;
+
+    private String personAge;
+
     @ManyToOne
     @JoinColumn(name = "st_genders_st_gender_id", nullable = false)
     private StGenderEntity genders;
 
 
     public String idCountry;
+
+    public String idCity;
 }
