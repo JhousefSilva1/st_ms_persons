@@ -21,6 +21,7 @@ public class StPersonEntity {
     private Long idPerson;
 
 //    @Column(name = "st_person_name")
+    @Column(nullable = false)
     private String personName;
 
 //    @Column(name = "st_person_surname")
@@ -33,7 +34,6 @@ public class StPersonEntity {
     private String personWhatsappNumber;
 
     @Column(nullable = false, unique = true)
-    //@Column(name = "st_person_email")
     private String personEmail;
 
     private String personPassword;
