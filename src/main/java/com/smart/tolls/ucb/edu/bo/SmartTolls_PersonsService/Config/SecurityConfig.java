@@ -16,6 +16,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .anyRequest().permitAll() // Permitir acceso a todas las solicitudes
+
                 )
                 .csrf(AbstractHttpConfigurer::disable); // Deshabilitar CSRF si estás haciendo pruebas
         return http.build();

@@ -44,12 +44,18 @@ public class StPersonEntity {
 
     private String personAge;
 
+    public String idCountry;
+
+    public String idCity;
+
     @ManyToOne
     @JoinColumn(name = "st_genders_st_gender_id", nullable = false)
     private StGenderEntity genders;
 
 
-    public String idCountry;
+    @ManyToOne
+    @JoinColumn(name = "st_person_type_st_person_type_id")
+    private StPersonTypeEntity personsType;
 
-    public String idCity;
+
 }

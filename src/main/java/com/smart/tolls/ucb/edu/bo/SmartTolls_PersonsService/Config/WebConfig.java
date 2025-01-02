@@ -13,5 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("**") // Permitir todos los orígenes
                 .allowedMethods("**") // Permitir todos los métodos HTTP
                 .allowedHeaders("**"); // Permitir todos los encabezados
+
     }
 }

@@ -20,4 +20,6 @@ public class SmartTollsPersonsServiceApplication {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
+
+
 }

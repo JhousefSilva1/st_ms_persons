@@ -26,41 +26,33 @@ public class StPersonService {
     public List<StPersonEntity> getAllPersons() {
         return stPersonRepository.findAll();
     }
-
     public StPersonEntity getPersonById(Long id) {
         return stPersonRepository.findById(id).get();
     }
-
     public StPersonEntity createPerson(StPersonEntity stPersonEntity) {
         return stPersonRepository.save(stPersonEntity);
     }
-
     public StPersonEntity updatePerson(Long id, StPersonEntity stPersonEntity) {
         StPersonEntity person = stPersonRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found"));
         person.setPersonName(stPersonEntity.getPersonName());
         return stPersonRepository.save(person);
     }
-
     public void deletePerson(Long id) {
         stPersonRepository.deleteById(id);
     }
 
-    public StResponseDTO getPersonWithCountry(Long id) {
-
-        StResponseDTO responseDTO = new StResponseDTO();
-        StPersonEntity person = new StPersonEntity();
-        person = stPersonRepository.findById(id).get();
-
-        ResponseEntity<StCountryDTO> responseEntity = restTemplate.getForEntity("http://localhost:8002/api/country/" + person.getIdCountry(), StCountryDTO.class);
-        ResponseEntity<StCityDTO> responseEntity1 = restTemplate.getForEntity("http://localhost:8002/api/city/" + person.getIdCity(), StCityDTO.class);
-        StCountryDTO countryDto = responseEntity.getBody();
-        StCityDTO cityDto = responseEntity1.getBody();
-
-        responseDTO.setPerson(person);
-        responseDTO.setCountryDto(countryDto);
-        responseDTO.setCityDto(cityDto);
-
-        return responseDTO;
-    }
+//    public StResponseDTO getPersonWithCountry(Long id) {
+//        StResponseDTO responseDTO = new StResponseDTO();
+//        StPersonEntity person = new StPersonEntity();
+//        person = stPersonRepository.findById(id).get();
+//        ResponseEntity<StCountryDTO> responseEntity = restTemplate.getForEntity("http://localhost:8002/api/country/**" + person.getIdCountry(), StCountryDTO.class);
+//        ResponseEntity<StCityDTO> responseEntity1 = restTemplate.getForEntity("http://localhost:8002/api/city/**" + person.getIdCity(), StCityDTO.class);
+//        StCountryDTO countryDto = responseEntity.getBody();
+//        StCityDTO cityDto = responseEntity1.getBody();
+//        responseDTO.setPerson(person);
+//        responseDTO.setCountryDto(countryDto);
+//        responseDTO.setCityDto(cityDto);
+//        return responseDTO;
+//    }
 
 }

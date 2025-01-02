@@ -21,10 +21,10 @@ public class StPersonController {
         return stPersonService.getAllPersons();
     }
 
-//    @GetMapping("/{id}")
-//    public StPersonEntity getPersonById(@PathVariable Long id){
-//        return stPersonService.getPersonById(id);
-//    }
+    @GetMapping("/{id}")
+    public StPersonEntity getPersonById(@PathVariable Long id){
+        return stPersonService.getPersonById(id);
+    }
 
     @PostMapping
     public StPersonEntity createPerson(@RequestBody StPersonEntity stPersonEntity){
@@ -42,9 +42,5 @@ public class StPersonController {
         return ResponseEntity.ok("Persona eliminada correctamente");
     }
 
-    @GetMapping("/{id}")
-    public StResponseDTO getPersonWithCountry(@PathVariable Long id){
-        return stPersonService.getPersonWithCountry(id);
-    }
 
 }
