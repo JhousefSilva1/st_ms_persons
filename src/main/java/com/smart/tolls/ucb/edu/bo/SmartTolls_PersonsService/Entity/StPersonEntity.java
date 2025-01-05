@@ -57,5 +57,15 @@ public class StPersonEntity {
     @JoinColumn(name = "st_person_type_st_person_type_id")
     private StPersonTypeEntity personsType;
 
+    private Integer status;
+
+    @Embedded
+    private Audit audit = new Audit();
+
+    @PrePersist
+    public void prePersist() {
+        this.status = 1;
+    }
+
 
 }

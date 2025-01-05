@@ -27,6 +27,17 @@ public class StPersonTypeEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "personsType", fetch = FetchType.LAZY)
     private List<StPersonEntity> persons;
+
+    private Integer status;
+
+
+    @Embedded
+    private Audit audit = new Audit();
+
+    @PrePersist
+    public void prePersist() {
+        this.status = 1;
+    }
 }
 
 
