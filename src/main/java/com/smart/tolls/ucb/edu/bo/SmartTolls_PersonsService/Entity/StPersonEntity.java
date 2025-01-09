@@ -1,7 +1,6 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -57,5 +56,14 @@ public class StPersonEntity {
     @JoinColumn(name = "st_person_type_st_person_type_id")
     private StPersonTypeEntity personsType;
 
+    @Column(name = "st_person_status")
+    private Integer status;
 
+    @Embedded
+    private Audit audit = new Audit();
+
+    @PrePersist
+    public void prePersist() {
+        this.status = 1;
+    }
 }

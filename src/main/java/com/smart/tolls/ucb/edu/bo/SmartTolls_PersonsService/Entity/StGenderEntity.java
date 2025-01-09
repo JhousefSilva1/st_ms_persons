@@ -28,4 +28,14 @@ public class StGenderEntity {
     @OneToMany(mappedBy = "genders", fetch = FetchType.LAZY)
     private List<StPersonEntity> persons;
 
+    @Column(name = "st_gender_status")
+    private Integer status;
+
+    @Embedded
+    private Audit audit = new Audit();
+
+    @PrePersist
+    public void prePersist() {
+        this.status = 1;
+    }
 }

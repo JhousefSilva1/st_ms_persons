@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StGenderService {
@@ -17,22 +18,28 @@ public class StGenderService {
         return stGenderRepository.findAll();
     }
 
-    public StGenderEntity getGenderById(Long id) {
-        return stGenderRepository.findById(id).get();
+    public List<StGenderEntity> getAllGendersByStatus() {
+        return stGenderRepository.findAllByStatus();
     }
 
-    public StGenderEntity createGender(StGenderEntity stGenderEntity) {
-        return stGenderRepository.save(stGenderEntity);
+    public Optional<StGenderEntity> getGenderById(Long id) {
+        return Optional.of(stGenderRepository.findByIdAndByStatus(id, 1L));
     }
 
-    public StGenderEntity updateGender(Long id, StGenderEntity stGenderEntity) {
-        StGenderEntity gender = stGenderRepository.findById(id).orElseThrow(() -> new RuntimeException("Gender not found"));
+    public Optional<StGenderEntity> createGender(StGenderEntity stGenderEntity) {
+        return Optional.of(stGenderRepository.save(stGenderEntity));
+    }
+
+    public Optional<StGenderEntity> updateGender(Long id, StGenderEntity stGenderEntity) {
+        StGenderEntity gender = stGenderRepository.findByIdAndByStatus(id, 1L);
         gender.setGenderName(stGenderEntity.getGenderName());
-        return stGenderRepository.save(gender);
+        return Optional.of(stGenderRepository.save(gender));
     }
 
-    public void deleteGender(Long id) {
-        stGenderRepository.deleteById(id);
+    public Optional<StGenderEntity> deleteGender(Long id) {
+        StGenderEntity gender = stGenderRepository.findByIdAndByStatus(id, 1L);
+        gender.setStatus(0);
+        return Optional.of(stGenderRepository.save(gender));
     }
 
 }
