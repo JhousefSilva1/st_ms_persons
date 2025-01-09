@@ -2,6 +2,10 @@ server:
   port: 8001
 eureka:
   instance:
+
+#   hostname: localhost  //this is for the local database
+
+#   settings for AWS RDS PostgreSQL
     hostname: mspersons.cfs6q686kbf1.us-east-2.rds.amazonaws.com
   client:
     service-url:
@@ -11,6 +15,13 @@ spring:
   application:
     name: persons-microservice
   datasource:
+
+#    this is for the local datrabase
+    #    url: jdbc:postgresql://localhost:5432/MsPersons
+    #    username: admin
+    #    password: 12345
+
+#   settings for AWS RDS PostgreSQL
     url: jdbc:postgresql://mspersons.cfs6q686kbf1.us-east-2.rds.amazonaws.com:5432/MsPersons
     username: postgres
     password: 12345678A
