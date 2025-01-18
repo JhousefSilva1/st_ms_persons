@@ -16,10 +16,7 @@ public class SmartTollsPersonsServiceApplication {
 		SpringApplication.run(SmartTollsPersonsServiceApplication.class, args);
 	}
 
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+
 
 
 }

@@ -18,7 +18,8 @@ public class StPersonService {
     @Autowired
     private StPersonRepository stPersonRepository;
 
-    private final RestTemplate restTemplate;
+//    @Autowired
+//    private final RestTemplate restTemplate;
 
     public List<StPersonEntity> getAllPersons() {
         return stPersonRepository.findAll();

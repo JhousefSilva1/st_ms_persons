@@ -1,15 +1,18 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity;
 
 
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Token;
 import jakarta.persistence.*;
 import lombok.*;
-
+import lombok.Builder;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 @Entity
 @Table(name = "st_person")
 public class StPersonEntity {
@@ -66,4 +69,8 @@ public class StPersonEntity {
     public void prePersist() {
         this.status = 1;
     }
+
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
 }
