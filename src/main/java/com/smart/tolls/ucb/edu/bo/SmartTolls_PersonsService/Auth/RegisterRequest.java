@@ -1,6 +1,7 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth;
 
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StGenderEntity;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
 
 import java.util.Date;
 
@@ -18,7 +19,7 @@ public record RegisterRequest(
         String idCountry,
         String idCity,
         StGenderEntity gender,
-        String idPersonType
+        StPersonTypeEntity personType
 
 
 ) {

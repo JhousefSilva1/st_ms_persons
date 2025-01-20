@@ -36,6 +36,7 @@ public class AuthService {
                     .idCountry(request.idCountry())
                     .idCity(request.idCity())
                     .genders(request.gender())
+                    .personsType(request.personType())
                     .build();
 
             final StPersonEntity savedUser = stPersonRepository.save(user);
