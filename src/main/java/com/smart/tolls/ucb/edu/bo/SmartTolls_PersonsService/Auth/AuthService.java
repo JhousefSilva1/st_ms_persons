@@ -22,27 +22,31 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public TokenResponse register(final RegisterRequest request){
-        final StPersonEntity user = StPersonEntity.builder()
-                .personName(request.personName())
-                .personSurname(request.personSurname())
-                .personBirthdate(request.personBirthdate())
-                .personWhatsappNumber(request.personWhatsappNumber())
-                .personEmail(request.personEmail())
-                .personPassword(passwordEncoder.encode(request.personPassword()))
-                .personDni(request.personDni())
-                .personAddress(request.personAddress())
-                .personAge(request.personAge())
-                .idCountry(request.idCountry())
-                .idCity(request.idCity())
-                .genders(request.gender())
-                .build();
+        try {
+            final StPersonEntity user = StPersonEntity.builder()
+                    .personName(request.personName())
+                    .personSurname(request.personSurname())
+                    .personBirthdate(request.personBirthdate())
+                    .personWhatsappNumber(request.personWhatsappNumber())
+                    .personEmail(request.personEmail())
+                    .personPassword(passwordEncoder.encode(request.personPassword()))
+                    .personDni(request.personDni())
+                    .personAddress(request.personAddress())
+                    .personAge(request.personAge())
+                    .idCountry(request.idCountry())
+                    .idCity(request.idCity())
+                    .genders(request.gender())
+                    .build();
 
-        final StPersonEntity savedUser = stPersonRepository.save(user);
-        final String JwtToken = jwtService.generateToken(savedUser);
-        final String refreshToken = jwtService.generateRefreshToken(savedUser);
+            final StPersonEntity savedUser = stPersonRepository.save(user);
+            final String JwtToken = jwtService.generateToken(savedUser);
+            final String refreshToken = jwtService.generateRefreshToken(savedUser);
 
-        saveUserToken(savedUser, JwtToken);
-        return new TokenResponse(JwtToken, refreshToken);
+            saveUserToken(savedUser, JwtToken);
+            return new TokenResponse(JwtToken, refreshToken);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public TokenResponse authenticate(final AuthRequest request){
@@ -85,8 +89,7 @@ public class AuthService {
         if(authentication == null || authentication.startsWith("Bearer ")) {
             throw new IllegalArgumentException("invalid auth header");
         }
-        final String refreshToken = authentication.substring(7);
-        final String userEmail = jwtService.extractUsername(refreshToken);
+        final String userEmail = jwtService.extractUsername(authentication);
         if(userEmail == null){
             return null;
         }
@@ -94,7 +97,7 @@ public class AuthService {
         final StPersonEntity user = this.stPersonRepository.findByPersonEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        final boolean isTokenValid = jwtService.isTokenValid(refreshToken, user);
+        final boolean isTokenValid = jwtService.isTokenValid(authentication, user);
         if (!isTokenValid){
             return null;
         }
@@ -102,6 +105,6 @@ public class AuthService {
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
 
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, authentication);
     }
 }
