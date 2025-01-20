@@ -39,7 +39,7 @@ public class StPersonTypeController extends ApiController{
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<StPersonTypeEntity> getPersonTypeById(Long id){
+    public ApiResponse<StPersonTypeEntity> getPersonTypeById(@PathVariable Long id){
         ApiResponse<StPersonTypeEntity> response = new ApiResponse<>();
         try {
             Optional<StPersonTypeEntity> personType = stPersonTypeService.getPersonTypeById(id);
@@ -62,7 +62,7 @@ public class StPersonTypeController extends ApiController{
     }
 
     @PostMapping
-    public ApiResponse<Optional<StPersonTypeEntity>> createPersonType(StPersonTypeEntity stPersonTypeEntity){
+    public ApiResponse<Optional<StPersonTypeEntity>> createPersonType(@RequestBody StPersonTypeEntity stPersonTypeEntity){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
         try {
             Optional<StPersonTypeEntity> personType = stPersonTypeService.createPersonType(stPersonTypeEntity);
@@ -80,7 +80,7 @@ public class StPersonTypeController extends ApiController{
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Optional<StPersonTypeEntity>> updatePersonType(Long id, StPersonTypeEntity stPersonTypeEntity){
+    public ApiResponse<Optional<StPersonTypeEntity>> updatePersonType(@PathVariable Long id, @RequestBody StPersonTypeEntity stPersonTypeEntity){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
         try {
             Optional<StPersonTypeEntity> personType = stPersonTypeService.updatePersonType(id, stPersonTypeEntity);
@@ -95,7 +95,7 @@ public class StPersonTypeController extends ApiController{
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Optional<StPersonTypeEntity>> deletePersonType(Long id){
+    public ApiResponse<Optional<StPersonTypeEntity>> deletePersonType(@PathVariable Long id){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
         try {
             Optional<StPersonTypeEntity> personType = stPersonTypeService.deletePersonType(id);
