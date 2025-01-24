@@ -57,18 +57,6 @@ public class StPersonService {
         return Optional.of(stPersonRepository.save(person));
     }
 
-//    public StResponseDTO getPersonWithCountry(Long id) {
-//        StResponseDTO responseDTO = new StResponseDTO();
-//        StPersonEntity person = new StPersonEntity();
-//        person = stPersonRepository.findById(id).get();
-//        ResponseEntity<StCountryDTO> responseEntity = restTemplate.getForEntity("http://localhost:8002/api/country/**" + person.getIdCountry(), StCountryDTO.class);
-//        ResponseEntity<StCityDTO> responseEntity1 = restTemplate.getForEntity("http://localhost:8002/api/city/**" + person.getIdCity(), StCityDTO.class);
-//        StCountryDTO countryDto = responseEntity.getBody();
-//        StCityDTO cityDto = responseEntity1.getBody();
-//        responseDTO.setPerson(person);
-//        responseDTO.setCountryDto(countryDto);
-//        responseDTO.setCityDto(cityDto);
-//        return responseDTO;
-//    }
+
 
 }
