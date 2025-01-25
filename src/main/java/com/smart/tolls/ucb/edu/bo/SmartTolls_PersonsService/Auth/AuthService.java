@@ -1,15 +1,21 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth;
 
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StGenderEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntity;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonRepository;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StGenderService;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonTypeService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +27,23 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    @Autowired
+    private StGenderService stGenderService;
+
+    @Autowired
+    private StPersonTypeService stPersonTypeService;
+
     public TokenResponse register(final RegisterRequest request){
         try {
+            Optional<StGenderEntity> gender = stGenderService.getGenderById(request.idGender());
+            if(!gender.isPresent()){
+                return null;
+            }
+            Optional<StPersonTypeEntity> personType = stPersonTypeService.getPersonTypeById(request.idPersonType());
+            if(!personType.isPresent()){
+                return null;
+            }
+
             final StPersonEntity user = StPersonEntity.builder()
                     .personName(request.personName())
                     .personSurname(request.personSurname())
@@ -33,10 +54,8 @@ public class AuthService {
                     .personDni(request.personDni())
                     .personAddress(request.personAddress())
                     .personAge(request.personAge())
-                    .idCountry(request.idCountry())
-                    .idCity(request.idCity())
-                    .genders(request.gender())
-                    .personsType(request.personType())
+                    .genders(gender.get())
+                    .personsType(personType.get())
                     .build();
 
             final StPersonEntity savedUser = stPersonRepository.save(user);

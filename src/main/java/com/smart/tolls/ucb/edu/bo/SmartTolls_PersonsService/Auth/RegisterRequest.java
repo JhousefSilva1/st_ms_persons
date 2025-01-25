@@ -16,10 +16,8 @@ public record RegisterRequest(
         String personDni,
         String personAddress,
         String personAge,
-        String idCountry,
-        String idCity,
-        StGenderEntity gender,
-        StPersonTypeEntity personType
+        Long idGender,
+        Long idPersonType
 
 
 ) {
