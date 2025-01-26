@@ -18,7 +18,7 @@ public class Token {
     @GeneratedValue
     private Integer id;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 1000)
     private String token;
 
     @Enumerated(EnumType.STRING)
@@ -32,7 +32,7 @@ public class Token {
     private Boolean isExpired;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "st_person_id")
+    @JoinColumn(name = "st_person_id", nullable = false)
     private StPersonEntity user;
 
     public enum TokenType {
