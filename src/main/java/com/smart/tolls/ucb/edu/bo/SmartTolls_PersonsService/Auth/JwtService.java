@@ -45,6 +45,7 @@ public class JwtService {
                 .claims(Map.of("lastName", user.getPersonSurname()))
                 .claims(Map.of("email", user.getPersonEmail()))
                 .claims(Map.of("role", user.getPersonsType().getPersonType()))
+                .claims(Map.of("idPerson", user.getIdPerson()))
                 .subject(user.getPersonEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
