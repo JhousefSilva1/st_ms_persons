@@ -2,6 +2,7 @@ package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity;
 
 
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Token;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.Country;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder;
@@ -46,9 +47,9 @@ public class StPersonEntity {
 
     private String personAge;
 
-    public String idCountry;
+    public Long idCountry;
 
-    public String idCity;
+    public Long idCity;
 
     @ManyToOne
     @JoinColumn(name = "st_genders_st_gender_id", nullable = false)

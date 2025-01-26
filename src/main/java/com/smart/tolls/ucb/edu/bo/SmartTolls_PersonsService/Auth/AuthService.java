@@ -1,5 +1,8 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth;
 
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Client.CountryCityClient;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.City;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.Country;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StGenderEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
@@ -26,6 +29,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final CountryCityClient countryCityClient;
 
     @Autowired
     private StGenderService stGenderService;
@@ -44,6 +48,19 @@ public class AuthService {
                 return null;
             }
 
+            Optional<Country> country = Optional.ofNullable(countryCityClient.getCountryById(request.idCountry()));
+//            Country country = countryCityClient.getCountryById(request.idCountry());
+            if(!country.isPresent()){
+                return null;
+            }
+            Optional<City> city = Optional.ofNullable(countryCityClient.getCityById(request.idCity()));
+//            City city = countryCityClient.getCityById(request.idCity());
+            if(!city.isPresent()){
+                return null;
+            }
+
+
+
             final StPersonEntity user = StPersonEntity.builder()
                     .personName(request.personName())
                     .personSurname(request.personSurname())
@@ -56,6 +73,8 @@ public class AuthService {
                     .personAge(request.personAge())
                     .genders(gender.get())
                     .personsType(personType.get())
+                    .idCountry(country.get().getId())
+                    .idCity(city.get().getId())
                     .build();
 
             final StPersonEntity savedUser = stPersonRepository.save(user);
