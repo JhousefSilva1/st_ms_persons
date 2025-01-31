@@ -59,8 +59,6 @@ public class AuthService {
                 return null;
             }
 
-
-
             final StPersonEntity user = StPersonEntity.builder()
                     .personName(request.personName())
                     .personSurname(request.personSurname())
