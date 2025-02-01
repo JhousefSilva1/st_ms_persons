@@ -31,7 +31,7 @@ public class JwtService {
     }
 
     public String generateToken(final StPersonEntity user) {
-        return buildToken(user, refreshExpiration);
+        return buildToken(user, jwtExpiration);
     }
 
     public String generateRefreshToken(final StPersonEntity user) {
@@ -62,7 +62,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()
