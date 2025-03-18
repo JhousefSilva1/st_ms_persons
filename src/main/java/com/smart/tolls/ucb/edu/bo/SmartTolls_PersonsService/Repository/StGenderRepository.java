@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface StGenderRepository extends JpaRepository<StGenderEntity, Long> {
-    @Query("select b from StGenderEntity b where b.status = 1 order by b.idGender asc")
+    @Query("select b from StGenderEntity b where b.genderStatus = 1 order by b.idGender asc")
     List<StGenderEntity> findAllByStatus();
 
-    @Query("select b from StGenderEntity b where b.idGender=?1 and b.status=?2")
+    @Query("select b from StGenderEntity b where b.idGender=?1 and b.genderStatus=?2")
     StGenderEntity findByIdAndByStatus(Long id, long status);
 }

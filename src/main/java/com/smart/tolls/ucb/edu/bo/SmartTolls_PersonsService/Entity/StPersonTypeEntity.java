@@ -1,6 +1,7 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,25 +19,22 @@ public class StPersonTypeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "st_person_type_id")
     private Long idPersonType;
 
-    @Column(name = "st_person_type")
     private String personType;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "personsType", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "personType", fetch = FetchType.LAZY)
     private List<StPersonEntity> persons;
 
-    @Column(name = "st_person_type_status")
-    private Integer status;
+    private Integer personTypeStatus;
 
     @Embedded
     private Audit audit = new Audit();
 
     @PrePersist
     public void prePersist() {
-        this.status = 1;
+        this.personTypeStatus = 1;
     }
 }
 

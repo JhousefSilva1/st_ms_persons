@@ -1,7 +1,7 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Client;
 
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.City;
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.Country;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CityDTO;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CountryDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface CountryCityClient {
 
     @GetMapping("/country/{id}")
-    Country getCountryById(@PathVariable("id") Long id);
+    CountryDTO getCountryById(@PathVariable("id") Long id);
 
     @GetMapping("/city/{id}")
-    City getCityById(@PathVariable("id") Long id);
+    CityDTO getCityById(@PathVariable("id") Long id);
 }

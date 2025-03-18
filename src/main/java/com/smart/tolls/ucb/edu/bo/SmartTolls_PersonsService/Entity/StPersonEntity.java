@@ -1,15 +1,14 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity;
 
-
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Token;
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.Country;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.Builder;
-import java.util.Date;
-import java.util.List;
 
-@Data
+import java.time.LocalDate;
+
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -20,58 +19,42 @@ public class StPersonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "st_person_id")
     private Long idPerson;
 
-//    @Column(name = "st_person_name")
-    @Column(nullable = false)
     private String personName;
-
-//    @Column(name = "st_person_surname")
     private String personSurname;
-
-//    @Column(name = "st_person_birthdate")
-    private Date personBirthdate;
-
-//    @Column(name = "st_person_whatsapp_number")
+    private LocalDate personBirthdate;
     private String personWhatsappNumber;
 
     @Column(nullable = false, unique = true)
     private String personEmail;
 
     private String personPassword;
-
     private String personDni;
-
     private String personAddress;
-
     private String personAge;
 
-    public Long idCountry;
-
-    public Long idCity;
-
-    @ManyToOne
-    @JoinColumn(name = "st_genders_st_gender_id", nullable = false)
-    private StGenderEntity genders;
-
+//    private Long idCountry;
+//    private Long idCity;
 
     @ManyToOne
-    @JoinColumn(name = "st_person_type_st_person_type_id")
-    private StPersonTypeEntity personsType;
+    @JoinColumn(name = "id_gender", nullable = false)
+    @JsonBackReference
+    private StGenderEntity gender;
 
-    @Column(name = "st_person_status")
-    private Integer status;
+    @ManyToOne
+    @JoinColumn(name = "id_person_type", nullable = false)
+    @JsonBackReference
+    private StPersonTypeEntity personType;
+
+
+    private Integer personStatus;
 
     @Embedded
     private Audit audit = new Audit();
 
     @PrePersist
     public void prePersist() {
-        this.status = 1;
+        this.personStatus = 1;
     }
-
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
-
 }

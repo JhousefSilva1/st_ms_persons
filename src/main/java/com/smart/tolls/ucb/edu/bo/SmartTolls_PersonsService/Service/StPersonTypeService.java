@@ -40,7 +40,7 @@ public class StPersonTypeService {
 
     public Optional<StPersonTypeEntity> deletePersonType(Long id) {
         StPersonTypeEntity personType = stPersonTypeRepository.findByIdAndByStatus(id, 1L);
-        personType.setStatus(0);
+        personType.setPersonTypeStatus(0);
         return Optional.of(stPersonTypeRepository.save(personType));
     }
 }

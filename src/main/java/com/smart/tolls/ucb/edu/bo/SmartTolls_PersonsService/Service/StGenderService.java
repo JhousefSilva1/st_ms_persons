@@ -38,7 +38,7 @@ public class StGenderService {
 
     public Optional<StGenderEntity> deleteGender(Long id) {
         StGenderEntity gender = stGenderRepository.findByIdAndByStatus(id, 1L);
-        gender.setStatus(0);
+        gender.setGenderStatus(0);
         return Optional.of(stGenderRepository.save(gender));
     }
 
