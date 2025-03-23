@@ -39,12 +39,11 @@ public class StPersonEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_gender", nullable = false)
-    @JsonBackReference
     private StGenderEntity gender;
 
     @ManyToOne
     @JoinColumn(name = "id_person_type", nullable = false)
-    @JsonBackReference
+
     private StPersonTypeEntity personType;
 
 

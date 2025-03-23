@@ -23,7 +23,7 @@ public class StGenderEntity {
 
     private String genderName;
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "gender", fetch = FetchType.LAZY)
     private List<StPersonEntity> persons;
 

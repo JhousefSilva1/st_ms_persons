@@ -1,7 +1,5 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response;
 
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.GenderDTO;
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.PersonTypeDTO;
 import lombok.*;
 
 import java.time.LocalDate;
