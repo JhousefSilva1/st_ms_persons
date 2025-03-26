@@ -20,4 +20,6 @@ public class StPersonRequest {
     private Integer personStatus;
     private Long idGender;
     private Long idPersonType;
+    private Long idCity;
+    private Long idCountry;
 }

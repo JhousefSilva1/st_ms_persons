@@ -1,6 +1,9 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Controller;
 
 
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Client.CountryCityClient;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CityDto;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CountryDto;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StGenderEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
@@ -10,7 +13,10 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response.StPe
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StGenderRepository;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonRepository;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonTypeRepository;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StGenderService;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonService;
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonTypeService;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -25,98 +32,163 @@ import java.util.List;
 public class StPersonController extends ApiController {
 
     @Autowired
-    private StPersonService stPersonService;
+    public StGenderService stGenderService;
+
     @Autowired
-    private StPersonRepository stPersonRepository;
+    public StPersonTypeService stPersonTypeService;
+
     @Autowired
-    private StGenderRepository stGenderRepository;
+    public StPersonService stPersonService;
+
     @Autowired
-    private StPersonTypeRepository stPersonTypeRepository;
+    public CountryCityClient countryCityClient;
+
+    @GetMapping("/all")
+    public ApiResponse<List<StPersonEntity>> getAllPerons(){
+        ApiResponse<List<StPersonEntity>> response = new ApiResponse<>();
+        List<StPersonEntity> persons = stPersonService.getAllPersons();
+        response.setData(persons);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage(HttpStatus.OK.getReasonPhrase());
+        return logApiResponse(response);
+    }
 
     @GetMapping
-    public ApiResponse<List<StPersonResponse>> getAllPersonsByStatus(){
-        ApiResponse<List<StPersonResponse>> response = new ApiResponse<>();
-        try{
-            if(!stPersonService.isServiceAvailable()){
-                response.setStatus(HttpStatus.SERVICE_UNAVAILABLE.value());
-                response.setMessage("The persons service is currently unavailable");
-                return logApiResponse(response);
-            }
-//            get list of responses with Dto
-            List<StPersonResponse> personResponse = stPersonService.getAllPersonsByStatus();
-            response.setData(personResponse);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage(HttpStatus.OK.getReasonPhrase());
-            return logApiResponse(response);
-        }catch (Exception e){
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("An unexpected error occurred: " + e.getMessage());
-        }
+    public ApiResponse<List<StPersonEntity>> getAllPersonsByStatus(){
+        ApiResponse<List<StPersonEntity>> response = new ApiResponse<>();
+        List<StPersonEntity> persons = stPersonService.getAllPersonsByStatus();
+        response.setData(persons);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<StPersonResponse>> getPersonById(@PathVariable Long id){
-        StPersonResponse stPersonResponse = stPersonService.getPersonById(id);
-        return ResponseEntity.ok(Collections.singletonList(stPersonResponse));
+    public ApiResponse<StPersonResponse> getPersonById(@PathVariable Long id){
+        ApiResponse<StPersonResponse> response = new ApiResponse<>();
+        try {
+            Optional<StPersonEntity> optionalPerson = stPersonService.getPersonById(id);
+            if(optionalPerson.isEmpty()){
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                response.setMessage("Person not found");
+                return logApiResponse(response);
+            }
+
+            StPersonEntity person = optionalPerson.get();
+            ApiResponse<CityDto> cityResponse = countryCityClient.getCityById(person.getIdCity());
+            if(cityResponse.getStatus() != HttpStatus.OK.value()){
+                response.setStatus(cityResponse.getStatus());
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage(cityResponse.getMessage());
+                response.setMessage("City not found");
+                return logApiResponse(response);
+            }
+
+            ApiResponse<CountryDto> countryResponse = countryCityClient.getCountryById(person.getIdCountry());
+            if(countryResponse.getStatus() != HttpStatus.OK.value()){
+                response.setStatus(countryResponse.getStatus());
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage(countryResponse.getMessage());
+                response.setMessage("Country not found");
+                return logApiResponse(response);
+            }
+
+            StPersonResponse personResponse = new StPersonResponse();
+            personResponse.setIdPerson(person.getIdPerson());
+            personResponse.setPersonName(person.getPersonName());
+            personResponse.setPersonSurname(person.getPersonSurname());
+            personResponse.setPersonWhatsappNumber(person.getPersonWhatsappNumber());
+            personResponse.setPersonPassword(person.getPersonPassword());
+            personResponse.setPersonDni(person.getPersonDni());
+            personResponse.setPersonBirthdate(person.getPersonBirthdate());
+            personResponse.setPersonEmail(person.getPersonEmail());
+            personResponse.setPersonAddress(person.getPersonAddress());
+            personResponse.setPersonAge(person.getPersonAge());
+            personResponse.setPersonStatus(person.getPersonStatus());
+            personResponse.setGender(person.getGender());
+            personResponse.setPersonType(person.getPersonType());
+            personResponse.setCountry(countryResponse.getData());
+            personResponse.setCity(cityResponse.getData());
+
+            response.setData(personResponse);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+
+        }catch (Exception e){
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        }
+        return logApiResponse(response);
     }
 
     @PostMapping
-    public ResponseEntity<StPersonEntity> createPerson(@RequestBody StPersonRequest personRequest){
-        StPersonEntity personEntity = stPersonService.createPerson(personRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(personEntity);
-    }
+    public ApiResponse<Optional<StPersonEntity>> createPerson(@RequestBody StPersonRequest stPersonRequest) {
+        ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
+        try {
 
-    @PutMapping("/{id}")
-    public ResponseEntity<StPersonEntity> updatePerson(@PathVariable Long id, @RequestBody StPersonRequest personRequest){
-        StPersonEntity personEntity = stPersonRepository.findByIdAndStatus(id,1)
-                .orElseThrow(() -> new RuntimeException("Person not found"));
-//        update person data
-        personEntity.setPersonName(personRequest.getPersonName());
-        personEntity.setPersonSurname(personRequest.getPersonSurname());
-        personEntity.setPersonDni(personRequest.getPersonDni());
-        personEntity.setPersonAddress(personRequest.getPersonAddress());
-        personEntity.setPersonAge(personRequest.getPersonAge());
-        personEntity.setPersonWhatsappNumber(personRequest.getPersonWhatsappNumber());
-        personEntity.setPersonBirthdate(personRequest.getPersonBirthdate());
-        personEntity.setPersonEmail(personRequest.getPersonEmail());
-        personEntity.setPersonPassword(personRequest.getPersonPassword());
+            Optional<StGenderEntity> gender = stGenderService.getGenderById(stPersonRequest.getIdGender());
+            if (gender.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                response.setMessage("Gender was not found");
+                return logApiResponse(response);
+            }
+            Optional<StPersonTypeEntity> personType = stPersonTypeService.getPersonTypeById(stPersonRequest.getIdPersonType());
+            if (personType.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                response.setMessage("Person Type was not found");
+                return logApiResponse(response);
+            }
 
-//        update gender
-        StGenderEntity gender = stGenderRepository.findById(personRequest.getIdGender())
-                .orElseThrow(() -> new RuntimeException("Gender was not found"));
+            ApiResponse<CountryDto> country = countryCityClient.getCountryById(stPersonRequest.getIdCountry());
+            if (country.getStatus() != HttpStatus.OK.value()) {
+                response.setStatus(country.getStatus());
+                response.setMessage(country.getMessage());
+                response.setMessage("Country was not found");
+                return logApiResponse(response);
+            }
 
-//        update personType
-        StPersonTypeEntity personType = stPersonTypeRepository.findById(personRequest.getIdPersonType())
-                .orElseThrow(() -> new RuntimeException("PersonType was not found"));
+            ApiResponse<CityDto> city = countryCityClient.getCityById(stPersonRequest.getIdCity());
+            if (city.getStatus() != HttpStatus.OK.value()) {
+                response.setStatus(city.getStatus());
+                response.setMessage(city.getMessage());
+                response.setMessage("City was not found");
+                return logApiResponse(response);
+            }
 
-        personEntity.setGender(gender);
-        personEntity.setPersonType(personType);
+            StPersonEntity person = new StPersonEntity();
+            person.setPersonName(stPersonRequest.getPersonName());
+            person.setPersonSurname(stPersonRequest.getPersonSurname());
+            person.setPersonWhatsappNumber(stPersonRequest.getPersonWhatsappNumber());
+            person.setPersonPassword(stPersonRequest.getPersonPassword());
+            person.setPersonDni(stPersonRequest.getPersonDni());
+            person.setPersonBirthdate(stPersonRequest.getPersonBirthdate());
+            person.setPersonEmail(stPersonRequest.getPersonEmail());
+            person.setPersonAddress(stPersonRequest.getPersonAddress());
+            person.setPersonAge(stPersonRequest.getPersonAge());
+            person.setPersonStatus(stPersonRequest.getPersonStatus());
+            person.setGender(gender.get());
+            person.setPersonType(personType.get());
+            person.setIdCountry(stPersonRequest.getIdCountry());
+            person.setIdCity(stPersonRequest.getIdCity());
 
-//        Save new data
+            Optional<StPersonEntity> persons = stPersonService.createPerson(person);
+            response.setData(persons);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (ConstraintViolationException e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        }
+        return logApiResponse(response);}
 
-        StPersonEntity updatedPerson = stPersonRepository.save(personEntity);
 
-        return ResponseEntity.status(HttpStatus.OK).body(updatedPerson);
-    }
 
-//    Delete Person (logic)
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePerson (@PathVariable Long id){
-
-//        Search person by id
-
-        StPersonEntity personEntity = stPersonRepository.findByIdAndStatus(id,1)
-                .orElseThrow(() -> new RuntimeException("Person not found"));
-
-//        Mark as deleted (status = 0)
-
-        personEntity.setPersonStatus(0);
-        stPersonRepository.save(personEntity);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
 
 
 

@@ -7,12 +7,10 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Setter
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Builder
 @Entity
 @Table(name = "st_person")
 public class StPersonEntity {
@@ -34,8 +32,9 @@ public class StPersonEntity {
     private String personAddress;
     private String personAge;
 
-//    private Long idCountry;
-//    private Long idCity;
+    private Long idCountry;
+
+    private Long idCity;
 
     @ManyToOne
     @JoinColumn(name = "id_gender", nullable = false)

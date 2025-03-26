@@ -12,8 +12,7 @@ public interface StPersonRepository extends JpaRepository<StPersonEntity, Long> 
     List<StPersonEntity> findAllByStatus();
 
     @Query("select b from StPersonEntity b where b.idPerson=?1 and b.personStatus=?2")
-    @EntityGraph(attributePaths = {"gender", "personType"})
-    Optional<StPersonEntity> findByIdAndStatus(Long id, int status);
+    StPersonEntity findByIdAndByStatus(Long id, int status);
 
 //    Optional<StPersonEntity> findByPersonEmail(String PersonEmail);
 
