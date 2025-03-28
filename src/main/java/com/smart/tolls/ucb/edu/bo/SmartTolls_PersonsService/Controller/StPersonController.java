@@ -10,9 +10,6 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeE
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Request.StPersonRequest;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response.ApiResponse;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response.StPersonResponse;
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StGenderRepository;
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonRepository;
-import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonTypeRepository;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StGenderService;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonService;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonTypeService;
@@ -185,7 +182,75 @@ public class StPersonController extends ApiController {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
         }
-        return logApiResponse(response);}
+        return logApiResponse(response);
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Optional<StPersonEntity>> updatePerson(@PathVariable Long id, @RequestBody StPersonRequest stPersonRequest) {
+        ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
+        try {
+            Optional<StPersonEntity> existingPerson = stPersonService.getPersonById(id);
+            if (existingPerson.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Person not found");
+                return logApiResponse(response);
+            }
+
+            // Validar si el género y el tipo de persona existen
+            Optional<StGenderEntity> gender = stGenderService.getGenderById(stPersonRequest.getIdGender());
+            if (gender.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Gender not found");
+                return logApiResponse(response);
+            }
+
+            Optional<StPersonTypeEntity> personType = stPersonTypeService.getPersonTypeById(stPersonRequest.getIdPersonType());
+            if (personType.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Person Type not found");
+                return logApiResponse(response);
+            }
+
+            // Validar ciudad y país llamando al microservicio
+            ApiResponse<CountryDto> country = countryCityClient.getCountryById(stPersonRequest.getIdCountry());
+            if (country.getStatus() != HttpStatus.OK.value()) {
+                response.setStatus(country.getStatus());
+                response.setMessage("Country not found");
+                return logApiResponse(response);
+            }
+
+            ApiResponse<CityDto> city = countryCityClient.getCityById(stPersonRequest.getIdCity());
+            if (city.getStatus() != HttpStatus.OK.value()) {
+                response.setStatus(city.getStatus());
+                response.setMessage("City not found");
+                return logApiResponse(response);
+            }
+
+            StPersonEntity updatedPerson = new StPersonEntity();
+            updatedPerson.setPersonName(stPersonRequest.getPersonName());
+            updatedPerson.setPersonSurname(stPersonRequest.getPersonSurname());
+            updatedPerson.setPersonWhatsappNumber(stPersonRequest.getPersonWhatsappNumber());
+            updatedPerson.setPersonDni(stPersonRequest.getPersonDni());
+            updatedPerson.setPersonBirthdate(stPersonRequest.getPersonBirthdate());
+            updatedPerson.setPersonEmail(stPersonRequest.getPersonEmail());
+            updatedPerson.setPersonAddress(stPersonRequest.getPersonAddress());
+            updatedPerson.setPersonAge(stPersonRequest.getPersonAge());
+            updatedPerson.setPersonStatus(stPersonRequest.getPersonStatus());
+            updatedPerson.setGender(gender.get());
+            updatedPerson.setPersonType(personType.get());
+            updatedPerson.setIdCountry(stPersonRequest.getIdCountry());
+            updatedPerson.setIdCity(stPersonRequest.getIdCity());
+
+            Optional<StPersonEntity> updatedEntity = stPersonService.updatePerson(id, updatedPerson);
+            response.setData(updatedEntity);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error updating person");
+        }
+        return logApiResponse(response);
+    }
 
 
 

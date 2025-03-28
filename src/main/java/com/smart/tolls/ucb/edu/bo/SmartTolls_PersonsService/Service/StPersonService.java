@@ -36,25 +36,31 @@ public class StPersonService {
         return Optional.of(stPersonRepository.save(stPersonEntity));
     }
 
-//    public Optional<StPersonEntity> updatePerson(Long id, StPersonEntity stPersonEntity){
-//        StPersonEntity person = stPersonRepository.findByIdAndStatus(id, 1);
-//
-//        person.setPersonName(stPersonEntity.getPersonName());
-//        person.setPersonSurname(stPersonEntity.getPersonSurname());
-//        person.setPersonEmail(stPersonEntity.getPersonEmail());
-//        person.setPersonWhatsappNumber(stPersonEntity.getPersonWhatsappNumber());
-//        person.setPersonAddress(stPersonEntity.getPersonAddress());
-//        person.setPersonStatus(stPersonEntity.getPersonStatus());
-//        person.setGender(stPersonEntity.getGender());
-//        person.setPersonType(stPersonEntity.getPersonType());
-//        return Optional.of(stPersonRepository.save(person));
-//    }
-//
-//    public Optional<StPersonEntity> deletePerson(Long id){
-//        StPersonEntity person = stPersonRepository.findByIdAndStatus(id, 1);
-//        person.setPersonStatus(0);
-//        return Optional.of(stPersonRepository.save(person));
-//    }
+    public Optional<StPersonEntity> updatePerson(Long id, StPersonEntity updatedPerson) {
+        Optional<StPersonEntity> existingPerson = stPersonRepository.findById(id);
+        if (existingPerson.isEmpty()) {
+            return Optional.empty();
+        }
+
+        StPersonEntity person = existingPerson.get();
+        person.setPersonName(updatedPerson.getPersonName());
+        person.setPersonSurname(updatedPerson.getPersonSurname());
+        person.setPersonWhatsappNumber(updatedPerson.getPersonWhatsappNumber());
+        person.setPersonDni(updatedPerson.getPersonDni());
+        person.setPersonBirthdate(updatedPerson.getPersonBirthdate());
+        person.setPersonEmail(updatedPerson.getPersonEmail());
+        person.setPersonAddress(updatedPerson.getPersonAddress());
+        person.setPersonAge(updatedPerson.getPersonAge());
+        person.setPersonStatus(updatedPerson.getPersonStatus());
+        person.setGender(updatedPerson.getGender());
+        person.setPersonType(updatedPerson.getPersonType());
+        person.setIdCountry(updatedPerson.getIdCountry());
+        person.setIdCity(updatedPerson.getIdCity());
+
+        return Optional.of(stPersonRepository.save(person));
+    }
+
+
 
 
 
