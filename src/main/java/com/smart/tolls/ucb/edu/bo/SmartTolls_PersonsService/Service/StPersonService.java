@@ -6,6 +6,7 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntit
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Repository.StPersonRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -19,6 +20,8 @@ public class StPersonService {
     @Autowired
     private StPersonRepository stPersonRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<StPersonEntity> getAllPersons(){
         return stPersonRepository.findAll();
@@ -33,6 +36,9 @@ public class StPersonService {
     }
 
     public Optional<StPersonEntity> createPerson(StPersonEntity stPersonEntity){
+
+        String encryptedPassword = passwordEncoder.encode(stPersonEntity.getPersonPassword());
+        stPersonEntity.setPersonPassword(encryptedPassword);
         return Optional.of(stPersonRepository.save(stPersonEntity));
     }
 
