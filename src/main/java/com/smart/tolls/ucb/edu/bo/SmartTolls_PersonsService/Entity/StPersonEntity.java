@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @ToString
 @Entity
 @Table(name = "st_person")
+@Builder(builderMethodName = "builder", toBuilder = true) // Configuración personalizada
+
 public class StPersonEntity {
 
     @Id

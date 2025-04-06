@@ -37,6 +37,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_sql_comments: true
+  jwt:
+    secret-key: tu-clave-secreta-muy-larga-y-compleja
+    expiration: 86400000 # 24 horas en milisegundos
+    refresh-expiration: 604800000 # 7 días en milisegundos
   cloud:
     config:
       enabled: false
