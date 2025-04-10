@@ -5,6 +5,7 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StGenderServ
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +54,8 @@ public class StGenderController extends ApiController {
         }
         return logApiResponse(response);
     }
-    @PostMapping
+    @PostMapping("create")
+    @PreAuthorize("hasRole('Administrador')" )
     public ApiResponse<Optional<StGenderEntity>> createGender(@RequestBody StGenderEntity stGenderEntity){
         ApiResponse<Optional<StGenderEntity>> response = new ApiResponse<>();
         try {

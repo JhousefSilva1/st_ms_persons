@@ -17,16 +17,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.stPersonRepository = stPersonRepository;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         StPersonEntity person = stPersonRepository.findByPersonEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+        // Convertir el PersonType a un rol (ej: "ROLE_ADMIN", "ROLE_USER")
+        String role = "" + person.getPersonType().getPersonType().toUpperCase();
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(person.getPersonEmail())
                 .password(person.getPersonPassword())
-                .roles(person.getPersonType().getPersonType()) // Asume que PersonType tiene un campo nombre
+                .roles(role)
                 .build();
     }
 }
