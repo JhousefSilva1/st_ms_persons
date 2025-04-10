@@ -3,6 +3,7 @@ package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Config;
 
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.JwtAuthFilter;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Service.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,7 +25,6 @@ public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
-
     public SecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFilter jwtAuthFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthFilter = jwtAuthFilter;
@@ -34,14 +34,28 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("api/auth/login").permitAll() // Permitir acceso sin autenticación
-
-                                .requestMatchers(HttpMethod.POST,"api/gender").hasRole("ADMINISTRADOR")
-                                .anyRequest().authenticated()
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+                        httpSecurityExceptionHandlingConfigurer
+                                .authenticationEntryPoint((request, response, authException) -> {
+                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                                })
                 )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"api/gender/create").hasRole("ADMINISTRADOR")
+                        .anyRequest().authenticated()
+                )
+
+//                .authorizeHttpRequests(authorizeRequests ->
+//                        authorizeRequests
+//                                .requestMatchers("/api/auth/**").permitAll()
+//                                .requestMatchers("api/auth/login").permitAll() // Permitir acceso sin autenticación
+//
+//                                .requestMatchers(HttpMethod.POST,"api/gender").hasRole("ADMINISTRADOR")
+//                                .anyRequest().authenticated()
+//                )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

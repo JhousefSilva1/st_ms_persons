@@ -55,7 +55,7 @@ public class StGenderController extends ApiController {
         return logApiResponse(response);
     }
     @PostMapping("create")
-    @PreAuthorize("hasRole('Administrador')" )
+
     public ApiResponse<Optional<StGenderEntity>> createGender(@RequestBody StGenderEntity stGenderEntity){
         ApiResponse<Optional<StGenderEntity>> response = new ApiResponse<>();
         try {
