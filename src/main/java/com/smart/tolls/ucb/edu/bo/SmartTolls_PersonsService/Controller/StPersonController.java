@@ -1,6 +1,5 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Controller;
 
-
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Client.CountryCityClient;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CityDto;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CountryDto;
@@ -16,30 +15,20 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonType
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-
 @RestController
 @RequestMapping("/api/persons")
 public class StPersonController extends ApiController {
-
     @Autowired
     public StGenderService stGenderService;
-
     @Autowired
     public StPersonTypeService stPersonTypeService;
-
     @Autowired
     public StPersonService stPersonService;
-
     @Autowired
     public CountryCityClient countryCityClient;
-
     @GetMapping("/all")
     public ApiResponse<List<StPersonEntity>> getAllPerons(){
         ApiResponse<List<StPersonEntity>> response = new ApiResponse<>();
@@ -49,7 +38,6 @@ public class StPersonController extends ApiController {
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
-
     @GetMapping
     public ApiResponse<List<StPersonEntity>> getAllPersonsByStatus(){
         ApiResponse<List<StPersonEntity>> response = new ApiResponse<>();
@@ -59,7 +47,6 @@ public class StPersonController extends ApiController {
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
-
     @GetMapping("/{id}")
     public ApiResponse<StPersonResponse> getPersonById(@PathVariable Long id){
         ApiResponse<StPersonResponse> response = new ApiResponse<>();
@@ -71,7 +58,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("Person not found");
                 return logApiResponse(response);
             }
-
             StPersonEntity person = optionalPerson.get();
             ApiResponse<CityDto> cityResponse = countryCityClient.getCityById(person.getIdCity());
             if(cityResponse.getStatus() != HttpStatus.OK.value()){
@@ -81,7 +67,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("City not found");
                 return logApiResponse(response);
             }
-
             ApiResponse<CountryDto> countryResponse = countryCityClient.getCountryById(person.getIdCountry());
             if(countryResponse.getStatus() != HttpStatus.OK.value()){
                 response.setStatus(countryResponse.getStatus());
@@ -90,7 +75,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("Country not found");
                 return logApiResponse(response);
             }
-
             StPersonResponse personResponse = new StPersonResponse();
             personResponse.setIdPerson(person.getIdPerson());
             personResponse.setPersonName(person.getPersonName());
@@ -107,23 +91,19 @@ public class StPersonController extends ApiController {
             personResponse.setPersonType(person.getPersonType());
             personResponse.setCountry(countryResponse.getData());
             personResponse.setCity(cityResponse.getData());
-
             response.setData(personResponse);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage(HttpStatus.OK.getReasonPhrase());
-
         }catch (Exception e){
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
         }
         return logApiResponse(response);
     }
-
-    @PostMapping
+    @PostMapping("/register")
     public ApiResponse<Optional<StPersonEntity>> createPerson(@RequestBody StPersonRequest stPersonRequest) {
         ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
         try {
-
             Optional<StGenderEntity> gender = stGenderService.getGenderById(stPersonRequest.getIdGender());
             if (gender.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -138,7 +118,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("Person Type was not found");
                 return logApiResponse(response);
             }
-
             ApiResponse<CountryDto> country = countryCityClient.getCountryById(stPersonRequest.getIdCountry());
             if (country.getStatus() != HttpStatus.OK.value()) {
                 response.setStatus(country.getStatus());
@@ -146,7 +125,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("Country was not found");
                 return logApiResponse(response);
             }
-
             ApiResponse<CityDto> city = countryCityClient.getCityById(stPersonRequest.getIdCity());
             if (city.getStatus() != HttpStatus.OK.value()) {
                 response.setStatus(city.getStatus());
@@ -154,7 +132,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("City was not found");
                 return logApiResponse(response);
             }
-
             StPersonEntity person = new StPersonEntity();
             person.setPersonName(stPersonRequest.getPersonName());
             person.setPersonSurname(stPersonRequest.getPersonSurname());
@@ -170,7 +147,6 @@ public class StPersonController extends ApiController {
             person.setPersonType(personType.get());
             person.setIdCountry(stPersonRequest.getIdCountry());
             person.setIdCity(stPersonRequest.getIdCity());
-
             Optional<StPersonEntity> persons = stPersonService.createPerson(person);
             response.setData(persons);
             response.setStatus(HttpStatus.OK.value());
@@ -184,7 +160,6 @@ public class StPersonController extends ApiController {
         }
         return logApiResponse(response);
     }
-
     @PutMapping("/{id}")
     public ApiResponse<Optional<StPersonEntity>> updatePerson(@PathVariable Long id, @RequestBody StPersonRequest stPersonRequest) {
         ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
@@ -195,7 +170,6 @@ public class StPersonController extends ApiController {
                 response.setMessage("Person not found");
                 return logApiResponse(response);
             }
-
             // Validar si el género y el tipo de persona existen
             Optional<StGenderEntity> gender = stGenderService.getGenderById(stPersonRequest.getIdGender());
             if (gender.isEmpty()) {
@@ -203,14 +177,12 @@ public class StPersonController extends ApiController {
                 response.setMessage("Gender not found");
                 return logApiResponse(response);
             }
-
             Optional<StPersonTypeEntity> personType = stPersonTypeService.getPersonTypeById(stPersonRequest.getIdPersonType());
             if (personType.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("Person Type not found");
                 return logApiResponse(response);
             }
-
             // Validar ciudad y país llamando al microservicio
             ApiResponse<CountryDto> country = countryCityClient.getCountryById(stPersonRequest.getIdCountry());
             if (country.getStatus() != HttpStatus.OK.value()) {
@@ -218,14 +190,12 @@ public class StPersonController extends ApiController {
                 response.setMessage("Country not found");
                 return logApiResponse(response);
             }
-
             ApiResponse<CityDto> city = countryCityClient.getCityById(stPersonRequest.getIdCity());
             if (city.getStatus() != HttpStatus.OK.value()) {
                 response.setStatus(city.getStatus());
                 response.setMessage("City not found");
                 return logApiResponse(response);
             }
-
             StPersonEntity updatedPerson = new StPersonEntity();
             updatedPerson.setPersonName(stPersonRequest.getPersonName());
             updatedPerson.setPersonSurname(stPersonRequest.getPersonSurname());
@@ -240,7 +210,6 @@ public class StPersonController extends ApiController {
             updatedPerson.setPersonType(personType.get());
             updatedPerson.setIdCountry(stPersonRequest.getIdCountry());
             updatedPerson.setIdCity(stPersonRequest.getIdCity());
-
             Optional<StPersonEntity> updatedEntity = stPersonService.updatePerson(id, updatedPerson);
             response.setData(updatedEntity);
             response.setStatus(HttpStatus.OK.value());
@@ -251,10 +220,4 @@ public class StPersonController extends ApiController {
         }
         return logApiResponse(response);
     }
-
-
-
-
-
-
 }

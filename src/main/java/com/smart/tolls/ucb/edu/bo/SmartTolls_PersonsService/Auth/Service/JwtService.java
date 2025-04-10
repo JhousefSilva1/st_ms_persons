@@ -1,13 +1,11 @@
-package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth;
-
-
+package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +15,42 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static javax.crypto.Cipher.SECRET_KEY;
-
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "VGhpcyBpcyBhIHNlY3JldCBrZXkgZm9yIEpXVCBzaWduaW5nIDAyNDYwNw==";
-    private static final long ACCESS_TOKEN_EXPIRATION = 86400000; // 24 horas
-    private static final long REFRESH_TOKEN_EXPIRATION = 604800000; // 7 días
 
-    // Genera token de acceso
-    public String generateToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, ACCESS_TOKEN_EXPIRATION);
+    @Value("${spring.jwt.secret}")
+    private String SECRET_KEY;
+
+    @Value("${spring.jwt.expiration}")
+    private long jwtExpiration;
+
+    @Value("${spring.jwt.refresh-expiration}")
+    private long refreshExpiration;
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    // Genera refresh token
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, REFRESH_TOKEN_EXPIRATION);
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
+    }
+
+    public String generateToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails
+    ) {
+        return buildToken(extraClaims, userDetails, jwtExpiration);
+    }
+
+    public String generateRefreshToken(
+            UserDetails userDetails
+    ) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
     private String buildToken(
@@ -40,23 +58,14 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
-        return Jwts.builder()
+        return Jwts
+                .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    // Métodos auxiliares (extracción de claims, validación, etc.)
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -72,11 +81,6 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
@@ -84,5 +88,10 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

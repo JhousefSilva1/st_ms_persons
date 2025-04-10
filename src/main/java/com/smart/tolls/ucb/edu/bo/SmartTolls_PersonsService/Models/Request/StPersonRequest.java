@@ -1,12 +1,8 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Request;
-
 import lombok.Data;
-
 import java.time.LocalDate;
-
 @Data
 public class StPersonRequest {
-
     private Long idPerson;
     private String personName;
     private String personSurname;

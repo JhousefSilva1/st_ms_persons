@@ -1,5 +1,4 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Controller;
-
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response.ApiResponse;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonTypeService;
@@ -7,17 +6,13 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/personsType")
 public class StPersonTypeController extends ApiController{
-
     @Autowired
     private StPersonTypeService stPersonTypeService;
-
     @GetMapping("/all")
     public ApiResponse<List<StPersonTypeEntity>> getAllPersonsType(){
         ApiResponse<List<StPersonTypeEntity>> response = new ApiResponse<>();
@@ -27,7 +22,6 @@ public class StPersonTypeController extends ApiController{
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
-
     @GetMapping
     public ApiResponse<List<StPersonTypeEntity>> getAllPersonsTypeByStatus(){
         ApiResponse<List<StPersonTypeEntity>> response = new ApiResponse<>();
@@ -37,7 +31,6 @@ public class StPersonTypeController extends ApiController{
         response.setMessage(HttpStatus.OK.getReasonPhrase());
         return logApiResponse(response);
     }
-
     @GetMapping("/{id}")
     public ApiResponse<StPersonTypeEntity> getPersonTypeById(@PathVariable Long id){
         ApiResponse<StPersonTypeEntity> response = new ApiResponse<>();
@@ -60,7 +53,6 @@ public class StPersonTypeController extends ApiController{
         }
         return logApiResponse(response);
     }
-
     @PostMapping
     public ApiResponse<Optional<StPersonTypeEntity>> createPersonType(@RequestBody StPersonTypeEntity stPersonTypeEntity){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
@@ -78,7 +70,6 @@ public class StPersonTypeController extends ApiController{
         }
         return logApiResponse(response);
     }
-
     @PutMapping("/{id}")
     public ApiResponse<Optional<StPersonTypeEntity>> updatePersonType(@PathVariable Long id, @RequestBody StPersonTypeEntity stPersonTypeEntity){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
@@ -93,7 +84,6 @@ public class StPersonTypeController extends ApiController{
         }
         return logApiResponse(response);
     }
-
     @DeleteMapping("/{id}")
     public ApiResponse<Optional<StPersonTypeEntity>> deletePersonType(@PathVariable Long id){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();

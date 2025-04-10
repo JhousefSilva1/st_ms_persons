@@ -16,22 +16,16 @@ import java.util.List;
 @Entity
 @Table(name = "st_person_type")
 public class StPersonTypeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPersonType;
-
     private String personType;
-
     @JsonIgnore
     @OneToMany(mappedBy = "personType", fetch = FetchType.LAZY)
     private List<StPersonEntity> persons;
-
     private Integer personTypeStatus;
-
     @Embedded
     private Audit audit = new Audit();
-
     @PrePersist
     public void prePersist() {
         this.personTypeStatus = 1;

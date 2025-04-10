@@ -1,5 +1,4 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Controller;
-
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Request.ApiRequest;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,20 +12,17 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 @Controller
 @Slf4j
 public class ApiController {
     public <T> ApiRequest<T> buildApiRequest(final Class<T> body, T data){
         ApiRequest<T> apiRequest = new ApiRequest<>();
-
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         Assert.state(attrs instanceof ServletRequestAttributes, "No current ServletRequestAttributes");
         HttpServletRequest httpRequest = ((ServletRequestAttributes) attrs).getRequest();
@@ -36,9 +32,7 @@ public class ApiController {
                         Function.identity(),
                         h -> Collections.list(httpRequest.getHeaders(h))
                 ));
-
         Marker uuidMarker = MarkerFactory.getMarker(UUID.randomUUID().toString());
-
         apiRequest.setUuid(uuidMarker.getName());
 //        apiRequest.setAppCode(SecurityContextHolder.getContext().getAuthentication().getName());
         apiRequest.setPath(ServletUriComponentsBuilder.fromCurrentRequest().build().getPath());
@@ -46,11 +40,9 @@ public class ApiController {
         apiRequest.setRemoteHost(httpRequest.getRemoteHost());
         apiRequest.setHeaders(headersMap);
         apiRequest.setData(data);
-
 //        log.info(uuidMarker, new Gson().toJson(apiRequest), uuidMarker.getName());
         return apiRequest;
     }
-
     public <T> ApiResponse<T> logApiResponse(ApiResponse<T> apiResponse) {
         if (apiResponse.getUuid() == null || apiResponse.getUuid().isEmpty()) {
             apiResponse.setUuid(UUID.randomUUID().toString());

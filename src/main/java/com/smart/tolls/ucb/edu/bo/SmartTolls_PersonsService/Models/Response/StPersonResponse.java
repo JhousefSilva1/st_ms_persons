@@ -1,13 +1,10 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response;
-
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CityDto;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Dto.CountryDto;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StGenderEntity;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
 import lombok.*;
-
 import java.time.LocalDate;
-
 @Data
 @Setter
 @Getter
@@ -29,7 +26,4 @@ public class StPersonResponse {
     private StPersonTypeEntity personType;
     private CityDto city;
     private CountryDto country;
-
-
-
 }

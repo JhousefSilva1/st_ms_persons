@@ -1,6 +1,4 @@
-package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth;
-
-
+package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-
+    private Long idPerson;
     private String personName;
     private String personSurname;
     private String personWhatsappNumber;
