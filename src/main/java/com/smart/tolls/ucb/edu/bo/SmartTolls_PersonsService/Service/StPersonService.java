@@ -48,7 +48,15 @@ public class StPersonService {
 
         return Optional.of(stPersonRepository.save(person));
     }
-
+    public Optional<StPersonEntity> deletePerson(Long id) {
+        Optional<StPersonEntity> existingPerson = stPersonRepository.findById(id);
+        if (existingPerson.isEmpty()) {
+            return Optional.empty();
+        }
+        StPersonEntity person = existingPerson.get();
+        person.setPersonStatus(0);
+        return Optional.of(stPersonRepository.save(person));
+    }
     public boolean existsByEmail(String email) {
         return stPersonRepository.findByPersonEmail(email).isPresent();
     }

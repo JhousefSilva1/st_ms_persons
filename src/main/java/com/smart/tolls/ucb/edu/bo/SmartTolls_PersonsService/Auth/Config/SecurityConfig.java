@@ -4,6 +4,7 @@ package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Config;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.JwtAuthFilter;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Service.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.http.protocol.HTTP;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -43,19 +44,34 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"api/gender/create").hasRole("ADMINISTRADOR")
-                        .anyRequest().authenticated()
-                )
+//                        auth
+                                .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+//                        Persons
+                                .requestMatchers(HttpMethod.GET,"/api/persons").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.GET,"/api/persons/all").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.GET,"/api/persons/{id}").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.POST,"/api/persons/create").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.PUT,"/api/persons/update/{id}").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.DELETE,"/api/persons/delete").hasRole("ADMINISTRADOR")
+//                        Genders
+                                .requestMatchers(HttpMethod.GET,"/api/gender").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/gender/all").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/gender/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/gender/create").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.PUT,"/api/gender/update/{id}").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.DELETE,"/api/gender/delete/{id}").hasRole("ADMINISTRADOR")
+//                        PersonsType
+                                .requestMatchers(HttpMethod.GET,"/api/personsType").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/personsType/all").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/personsType/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/personsType/create").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.PUT,"/api/personsType/update/{id}").hasRole("ADMINISTRADOR")
+                                .requestMatchers(HttpMethod.DELETE,"/api/personsType/delete/{id}").hasRole("ADMINISTRADOR")
 
-//                .authorizeHttpRequests(authorizeRequests ->
-//                        authorizeRequests
-//                                .requestMatchers("/api/auth/**").permitAll()
-//                                .requestMatchers("api/auth/login").permitAll() // Permitir acceso sin autenticación
-//
-//                                .requestMatchers(HttpMethod.POST,"api/gender").hasRole("ADMINISTRADOR")
-//                                .anyRequest().authenticated()
-//                )
+
+                        .anyRequest().denyAll()
+                )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

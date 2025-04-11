@@ -54,8 +54,7 @@ public class StGenderController extends ApiController {
         }
         return logApiResponse(response);
     }
-    @PostMapping("create")
-
+    @PostMapping("/create")
     public ApiResponse<Optional<StGenderEntity>> createGender(@RequestBody StGenderEntity stGenderEntity){
         ApiResponse<Optional<StGenderEntity>> response = new ApiResponse<>();
         try {
@@ -72,7 +71,7 @@ public class StGenderController extends ApiController {
         }
         return logApiResponse(response);
     }
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ApiResponse<Optional<StGenderEntity>> updateGender(@PathVariable Long id, @RequestBody StGenderEntity stGenderEntity){
         ApiResponse<Optional<StGenderEntity>> response = new ApiResponse<>();
         try {
@@ -86,7 +85,7 @@ public class StGenderController extends ApiController {
         }
         return logApiResponse(response);
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ApiResponse<Optional<StGenderEntity>> deleteGender(@PathVariable Long id){
         ApiResponse<Optional<StGenderEntity>> response = new ApiResponse<>();
         try {

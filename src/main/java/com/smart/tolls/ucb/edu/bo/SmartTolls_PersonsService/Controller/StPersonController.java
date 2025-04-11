@@ -100,7 +100,7 @@ public class StPersonController extends ApiController {
         }
         return logApiResponse(response);
     }
-    @PostMapping("/register")
+    @PostMapping("/create")
     public ApiResponse<Optional<StPersonEntity>> createPerson(@RequestBody StPersonRequest stPersonRequest) {
         ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
         try {
@@ -160,7 +160,7 @@ public class StPersonController extends ApiController {
         }
         return logApiResponse(response);
     }
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ApiResponse<Optional<StPersonEntity>> updatePerson(@PathVariable Long id, @RequestBody StPersonRequest stPersonRequest) {
         ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
         try {
@@ -217,6 +217,21 @@ public class StPersonController extends ApiController {
         } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setMessage("Error updating person");
+        }
+        return logApiResponse(response);
+    }
+
+    @PostMapping("/delete/{id}")
+    public ApiResponse<Optional<StPersonEntity>> deletePerson(@PathVariable Long id) {
+        ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();
+        try {
+            Optional<StPersonEntity> deletedPerson = stPersonService.deletePerson(id);
+            response.setData(deletedPerson);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage(HttpStatus.OK.getReasonPhrase());
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setMessage("Error deleting person");
         }
         return logApiResponse(response);
     }

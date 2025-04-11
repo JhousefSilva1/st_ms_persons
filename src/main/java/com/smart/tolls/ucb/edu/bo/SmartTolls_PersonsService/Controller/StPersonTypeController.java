@@ -53,7 +53,7 @@ public class StPersonTypeController extends ApiController{
         }
         return logApiResponse(response);
     }
-    @PostMapping
+    @PostMapping("/create")
     public ApiResponse<Optional<StPersonTypeEntity>> createPersonType(@RequestBody StPersonTypeEntity stPersonTypeEntity){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
         try {
@@ -70,7 +70,7 @@ public class StPersonTypeController extends ApiController{
         }
         return logApiResponse(response);
     }
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ApiResponse<Optional<StPersonTypeEntity>> updatePersonType(@PathVariable Long id, @RequestBody StPersonTypeEntity stPersonTypeEntity){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
         try {
@@ -84,7 +84,7 @@ public class StPersonTypeController extends ApiController{
         }
         return logApiResponse(response);
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ApiResponse<Optional<StPersonTypeEntity>> deletePersonType(@PathVariable Long id){
         ApiResponse<Optional<StPersonTypeEntity>> response = new ApiResponse<>();
         try {
