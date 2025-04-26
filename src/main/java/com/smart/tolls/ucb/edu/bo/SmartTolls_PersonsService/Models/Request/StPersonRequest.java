@@ -1,6 +1,8 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Request;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.Date;
+
 @Data
 public class StPersonRequest {
     private Long idPerson;
@@ -9,7 +11,7 @@ public class StPersonRequest {
     private String personWhatsappNumber;
     private String personPassword;
     private String personDni;
-    private LocalDate personBirthdate;
+    private Date personBirthdate;
     private String personEmail;
     private String personAddress;
     private String personAge;

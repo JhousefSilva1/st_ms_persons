@@ -1,5 +1,6 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Auth.Service;
 
+import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -39,13 +40,32 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, StPersonEntity stPersonEntity) {
         Map<String, Object> claims = new HashMap<>();
         // Agregar roles al token
+        claims.put("email", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
+
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
-        return generateToken(claims, userDetails);
+        claims.put("personId", stPersonEntity.getIdPerson());
+        claims.put("name", stPersonEntity.getPersonName());
+        claims.put("lastName", stPersonEntity.getPersonSurname());
+        claims.put("state", stPersonEntity.getPersonStatus());
+
+        return buildToken(claims, userDetails, jwtExpiration);
+    }
+
+    public Long extractPersonId(String token){
+        return extractClaim(token, claims -> claims.get("personId", Long.class));
+    }
+
+    public String extractPersonName(String token) {
+        return extractClaim(token, claims -> claims.get("personName", String.class));
+    }
+
+    public String extractPersonSurname(String token) {
+        return extractClaim(token, claims -> claims.get("personSurname", String.class));
     }
 
     // Método para extraer los roles del token
@@ -54,15 +74,9 @@ public class JwtService {
         return claims.get("roles", List.class);
     }
 
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
-    }
 
-    public String generateRefreshToken(
-            UserDetails userDetails
+
+    public String generateRefreshToken(UserDetails userDetails
     ) {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }

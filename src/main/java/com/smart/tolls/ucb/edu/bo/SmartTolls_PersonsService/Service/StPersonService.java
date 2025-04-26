@@ -60,4 +60,8 @@ public class StPersonService {
     public boolean existsByEmail(String email) {
         return stPersonRepository.findByPersonEmail(email).isPresent();
     }
+
+    public Optional<StPersonEntity> findByEmail(String email) {
+        return stPersonRepository.findByPersonEmail(email);
+    }
 }

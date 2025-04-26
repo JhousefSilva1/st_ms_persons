@@ -21,11 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
+
     public SecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFilter jwtAuthFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthFilter = jwtAuthFilter;
@@ -34,46 +34,48 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
-                        httpSecurityExceptionHandlingConfigurer
-                                .authenticationEntryPoint((request, response, authException) -> {
-                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                                })
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-//                        auth
-                                .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
-//                        Persons
-                                .requestMatchers(HttpMethod.GET,"/api/persons").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.GET,"/api/persons/all").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.GET,"/api/persons/{id}").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.POST,"/api/persons/create").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.PUT,"/api/persons/update/{id}").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.DELETE,"/api/persons/delete").hasRole("ADMINISTRADOR")
-//                        Genders
-                                .requestMatchers(HttpMethod.GET,"/api/gender").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/gender/all").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/gender/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/gender/create").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.PUT,"/api/gender/update/{id}").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.DELETE,"/api/gender/delete/{id}").hasRole("ADMINISTRADOR")
-//                        PersonsType
-                                .requestMatchers(HttpMethod.GET,"/api/personsType").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/personsType/all").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/personsType/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/personsType/create").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.PUT,"/api/personsType/update/{id}").hasRole("ADMINISTRADOR")
-                                .requestMatchers(HttpMethod.DELETE,"/api/personsType/delete/{id}").hasRole("ADMINISTRADOR")
-
-
-                        .anyRequest().denyAll()
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {}) // Habilita CORS usando la configuración global de WebMvcConfigurer
+                .exceptionHandling(handler ->
+                        handler.authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+                        )
                 )
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        // Auth
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+
+                        // Persons
+                        .requestMatchers(HttpMethod.GET, "/api/persons").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/persons/all").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/persons/{id}").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/persons/create").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/persons/update/{id}").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/persons/delete").hasRole("ADMINISTRADOR")
+
+                        // Gender
+                        .requestMatchers(HttpMethod.GET, "/api/gender").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/gender/all").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/gender/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/gender/create").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/gender/update/{id}").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/gender/delete/{id}").hasRole("ADMINISTRADOR")
+
+                        // PersonsType
+                        .requestMatchers(HttpMethod.GET, "/api/personsType").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/personsType/all").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/personsType/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/personsType/create").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/personsType/update/{id}").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/personsType/delete/{id}").hasRole("ADMINISTRADOR")
+
+                        // Por defecto, denegar todo lo demás
+                        .anyRequest().denyAll()
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

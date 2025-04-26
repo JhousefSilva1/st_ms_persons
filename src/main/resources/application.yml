@@ -2,7 +2,6 @@ server:
   port: 8001
 eureka:
   instance:
-
    hostname: localhost
 
 #   settings for AWS RDS PostgreSQL

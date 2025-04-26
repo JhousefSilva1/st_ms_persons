@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,15 +22,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-
-    public JwtAuthFilter(JwtService jwtService, UserDetailsService userDetailsService) {
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     protected void doFilterInternal(
@@ -53,21 +50,51 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
-                // Extraer roles del token
+                // Extraer información adicional
+                Long personId = jwtService.extractPersonId(jwt);
+                String personName = jwtService.extractPersonName(jwt);
+                String personSurname = jwtService.extractPersonSurname(jwt);
+
+                // Extraer roles
                 List<String> roles = jwtService.extractRoles(jwt);
                 Collection<? extends GrantedAuthority> authorities = roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                // Crear autenticación con información adicional
+                JwtAuthenticationToken authToken = new JwtAuthenticationToken(
                         userDetails,
                         null,
-                        authorities
+                        authorities,
+                        personId,
+                        personName,
+                        personSurname
                 );
+
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    // Clase personalizada para transportar la información adicional
+    public static class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken {
+        private final Long personId;
+        private final String personName;
+        private final String personSurname;
+
+        public JwtAuthenticationToken(Object principal, Object credentials,
+                                      Collection<? extends GrantedAuthority> authorities,
+                                      Long personId, String personName, String personSurname) {
+            super(principal, credentials, authorities);
+            this.personId = personId;
+            this.personName = personName;
+            this.personSurname = personSurname;
+        }
+
+        public Long getPersonId() { return personId; }
+        public String getPersonName() { return personName; }
+        public String getPersonSurname() { return personSurname; }
     }
 }

@@ -17,18 +17,23 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Models.Response.ApiR
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StGenderService;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonService;
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Service.StPersonTypeService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController extends ApiController {
 
@@ -108,11 +113,11 @@ public class AuthController extends ApiController {
 
             // Generar token
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getPersonEmail());
-            String jwtToken = jwtService.generateToken(userDetails);
+            String jwtToken = jwtService.generateToken(userDetails, savedPerson.get());
             String refreshToken = jwtService.generateRefreshToken(userDetails);
 
             AuthResponse authResponse = AuthResponse.builder()
-                    .token(jwtToken)
+                    .accessToken(jwtToken)
                     .refreshToken(refreshToken)
                     .build();
 
@@ -127,7 +132,6 @@ public class AuthController extends ApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> authenticate(
             @RequestBody AuthRequest request
@@ -135,31 +139,48 @@ public class AuthController extends ApiController {
         ApiResponse<AuthResponse> response = new ApiResponse<>();
 
         try {
-            authenticationManager.authenticate(
+            // 1. Autenticar con Spring Security
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
+                            request.getPersonEmail(),
+                            request.getPersonPassword()
                     )
             );
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-            String jwtToken = jwtService.generateToken(userDetails);
-            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            // 2. Verificar que la autenticación fue exitosa
+            if (authentication.isAuthenticated()) {
+                // 3. Obtener UserDetails
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            AuthResponse authResponse = AuthResponse.builder()
-                    .token(jwtToken)
-                    .refreshToken(refreshToken)
-                    .build();
+                // 4. Obtener la entidad Person completa
+                StPersonEntity person = stPersonService.findByEmail(request.getPersonEmail())
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            response.setData(authResponse);
-            response.setStatus(HttpStatus.OK.value());
-            response.setMessage("Login successful");
-            return ResponseEntity.ok(response);
+                // 5. Generar tokens
+                String jwtToken = jwtService.generateToken(userDetails, person);
+                String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        } catch (Exception e) {
+                AuthResponse authResponse = AuthResponse.builder()
+                        .accessToken(jwtToken)
+                        .refreshToken(refreshToken)
+                        .build();
+
+                response.setData(authResponse);
+                response.setStatus(HttpStatus.OK.value());
+                response.setMessage("Login successful");
+                return ResponseEntity.ok(response);
+            } else {
+                throw new AuthenticationCredentialsNotFoundException("Authentication failed");
+            }
+
+        } catch (BadCredentialsException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setMessage("Invalid email or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("Error during authentication: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -171,23 +192,26 @@ public class AuthController extends ApiController {
 
         try {
             if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage("Invalid refresh token");
-                return ResponseEntity.badRequest().body(response);
+                throw new IllegalArgumentException("Invalid refresh token");
             }
 
             String jwt = refreshToken.substring(7);
             String userEmail = jwtService.extractUsername(jwt);
 
             if (userEmail != null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
-                    String newToken = jwtService.generateToken(userDetails);
+                    // Obtener datos actualizados de la persona
+                    StPersonEntity person = stPersonService.findByEmail(userEmail)
+                            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+                    // Generar nuevos tokens con información actualizada
+                    String newToken = jwtService.generateToken(userDetails, person);
                     String newRefreshToken = jwtService.generateRefreshToken(userDetails);
 
                     AuthResponse authResponse = AuthResponse.builder()
-                            .token(newToken)
+                            .accessToken(newToken)
                             .refreshToken(newRefreshToken)
                             .build();
 
@@ -197,14 +221,15 @@ public class AuthController extends ApiController {
                     return ResponseEntity.ok(response);
                 }
             }
+            throw new JwtException("Invalid refresh token");
 
+        } catch (JwtException | IllegalArgumentException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setMessage("Invalid refresh token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error refreshing token");
+            response.setMessage("Error refreshing token: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

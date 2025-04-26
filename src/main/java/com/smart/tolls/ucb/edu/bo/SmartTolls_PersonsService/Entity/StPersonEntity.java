@@ -1,7 +1,9 @@
 package com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class StPersonEntity {
     private Long idPerson;
     private String personName;
     private String personSurname;
-    private LocalDate personBirthdate;
+    private Date personBirthdate;
     private String personWhatsappNumber;
     @Column(nullable = false, unique = true)
     private String personEmail;

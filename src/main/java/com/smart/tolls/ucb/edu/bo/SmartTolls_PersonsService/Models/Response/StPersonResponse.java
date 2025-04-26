@@ -5,6 +5,8 @@ import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StGenderEntit
 import com.smart.tolls.ucb.edu.bo.SmartTolls_PersonsService.Entity.StPersonTypeEntity;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.Date;
+
 @Data
 @Setter
 @Getter
@@ -17,7 +19,7 @@ public class StPersonResponse {
     private String personWhatsappNumber;
     private String personPassword;
     private String personDni;
-    private LocalDate personBirthdate;
+    private Date personBirthdate;
     private String personEmail;
     private String personAddress;
     private String personAge;
