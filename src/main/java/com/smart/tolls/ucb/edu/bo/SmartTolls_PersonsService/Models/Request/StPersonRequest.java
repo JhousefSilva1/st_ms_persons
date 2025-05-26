@@ -11,7 +11,7 @@ public class StPersonRequest {
     private String personWhatsappNumber;
     private String personPassword;
     private String personDni;
-    private Date personBirthdate;
+    private String personBirthdate;
     private String personEmail;
     private String personAddress;
     private String personAge;

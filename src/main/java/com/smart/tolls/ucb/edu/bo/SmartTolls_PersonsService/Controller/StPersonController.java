@@ -16,6 +16,8 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @RestController
@@ -100,6 +102,73 @@ public class StPersonController extends ApiController {
         }
         return logApiResponse(response);
     }
+//    get person by personTypeId
+//    @GetMapping("/personType/{id}")
+//    public ApiResponse<List<StPersonEntity>> getPersonByPersonTypeId(@PathVariable Long id){
+//        ApiResponse<List<StPersonEntity>> response = new ApiResponse<>();
+//        try {
+//            List<StPersonEntity> persons = stPersonService.getAllPersonsByStatus();
+//            List<StPersonEntity> filteredPersons = persons.stream()
+//                    .filter(person -> person.getPersonType().getIdPersonType().equals(id))
+//                    .toList();
+//            response.setData(filteredPersons);
+//            response.setStatus(HttpStatus.OK.value());
+//            response.setMessage(HttpStatus.OK.getReasonPhrase());
+//        }catch (Exception e){
+//            response.setStatus(HttpStatus.BAD_REQUEST.value());
+//            response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+//        }
+//        return logApiResponse(response);
+//    }
+@GetMapping("/personType/{id}")
+public ApiResponse<List<StPersonResponse>> getPersonByPersonTypeId(@PathVariable Long id) {
+    ApiResponse<List<StPersonResponse>> response = new ApiResponse<>();
+    try {
+        List<StPersonEntity> persons = stPersonService.getAllPersonsByStatus();
+        List<StPersonResponse> personResponses = new ArrayList<>();
+
+        for (StPersonEntity person : persons) {
+            if (person.getPersonType().getIdPersonType().equals(id)) {
+                // Obtener ciudad y país como en el otro endpoint
+                ApiResponse<CityDto> cityResponse = countryCityClient.getCityById(person.getIdCity());
+                if(cityResponse.getStatus() != HttpStatus.OK.value()) continue;
+
+                ApiResponse<CountryDto> countryResponse = countryCityClient.getCountryById(person.getIdCountry());
+                if(countryResponse.getStatus() != HttpStatus.OK.value()) continue;
+
+                // Crear response igual que en el otro endpoint
+                StPersonResponse personResponse = new StPersonResponse();
+                personResponse.setIdPerson(person.getIdPerson());
+                personResponse.setPersonName(person.getPersonName());
+                personResponse.setPersonSurname(person.getPersonSurname());
+                personResponse.setPersonWhatsappNumber(person.getPersonWhatsappNumber());
+                personResponse.setPersonPassword(person.getPersonPassword());
+                personResponse.setPersonDni(person.getPersonDni());
+                personResponse.setPersonBirthdate(person.getPersonBirthdate());
+                personResponse.setPersonEmail(person.getPersonEmail());
+                personResponse.setPersonAddress(person.getPersonAddress());
+                personResponse.setPersonAge(person.getPersonAge());
+                personResponse.setPersonStatus(person.getPersonStatus());
+                personResponse.setGender(person.getGender());
+                personResponse.setPersonType(person.getPersonType());
+                personResponse.setCountry(countryResponse.getData());
+                personResponse.setCity(cityResponse.getData());
+
+                personResponses.add(personResponse);
+            }
+        }
+
+        response.setData(personResponses);
+        response.setStatus(HttpStatus.OK.value());
+        response.setMessage(HttpStatus.OK.getReasonPhrase());
+
+    } catch (Exception e) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+    }
+    return logApiResponse(response);
+}
+
     @PostMapping("/create")
     public ApiResponse<Optional<StPersonEntity>> createPerson(@RequestBody StPersonRequest stPersonRequest) {
         ApiResponse<Optional<StPersonEntity>> response = new ApiResponse<>();

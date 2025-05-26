@@ -49,11 +49,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
 
+
                         // Persons
-                        .requestMatchers(HttpMethod.GET, "/api/persons").hasRole("ADMINISTRADOR")
-                        .requestMatchers(HttpMethod.GET, "/api/persons/all").hasRole("ADMINISTRADOR")
-                        .requestMatchers(HttpMethod.GET, "/api/persons/{id}").hasRole("ADMINISTRADOR")
-                        .requestMatchers(HttpMethod.POST, "/api/persons/create").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/persons").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/persons/all").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/persons/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/persons/create").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/persons/update/{id}").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/persons/delete").hasRole("ADMINISTRADOR")
 
@@ -61,15 +62,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/gender").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/gender/all").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/gender/{id}").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/gender/create").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/gender/create").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/gender/update/{id}").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/gender/delete/{id}").hasRole("ADMINISTRADOR")
-
+//                     Person By personTypeId
+                        .requestMatchers(HttpMethod.GET, "/api/persons/personType/{id}").permitAll()
                         // PersonsType
                         .requestMatchers(HttpMethod.GET, "/api/personsType").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/personsType/all").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/personsType/{id}").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/personsType/create").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/personsType/create").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/personsType/update/{id}").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/personsType/delete/{id}").hasRole("ADMINISTRADOR")
 

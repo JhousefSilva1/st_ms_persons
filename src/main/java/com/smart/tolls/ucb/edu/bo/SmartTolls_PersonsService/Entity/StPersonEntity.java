@@ -17,7 +17,7 @@ public class StPersonEntity {
     private Long idPerson;
     private String personName;
     private String personSurname;
-    private Date personBirthdate;
+    private String personBirthdate;
     private String personWhatsappNumber;
     @Column(nullable = false, unique = true)
     private String personEmail;
